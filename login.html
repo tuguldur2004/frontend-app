@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="page-header">
+        <h1>Login</h1>
+        <div class="top-links">
+          <a href="/register">Register</a>
+        </div>
+      </header>
+      <p class="subtitle">Sign in to view and manage your profile</p>
+
+      <form id="loginForm">
+        <label>Username</label>
+        <input id="username" required />
+
+        <label>Password</label>
+        <input id="password" type="password" required />
+
+        <button type="submit">Login</button>
+      </form>
+
+      <div id="msg" class="message" style="display: none"></div>
+      <p class="small">
+        Flow: SOAP LoginUser -> token -> localStorage -> redirect /profile
+      </p>
+    </div>
+
+    <script type="module" src="./src/login.js"></script>
+  </body>
+</html>

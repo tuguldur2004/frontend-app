@@ -1,0 +1,12 @@
+# IDE
+.project
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local env
+.env
+.env.local

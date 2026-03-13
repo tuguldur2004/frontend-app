@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="page-header">
+        <h1>Register</h1>
+        <div class="top-links">
+          <a href="/login">Login</a>
+        </div>
+      </header>
+      <p class="subtitle">Create your account and profile in one step</p>
+
+      <form id="registerForm">
+        <fieldset>
+          <legend>Account Information</legend>
+          <label>Username</label>
+          <input id="username" required />
+
+          <label>Email</label>
+          <input id="email" type="email" required />
+
+          <label>Password</label>
+          <input id="password" type="password" required />
+        </fieldset>
+
+        <fieldset>
+          <legend>Profile Information (optional)</legend>
+          <label>Name</label>
+          <input id="name" />
+
+          <label>Phone</label>
+          <input id="phone" />
+
+          <label>Location</label>
+          <input id="location" />
+
+          <label>Website</label>
+          <input id="website" />
+        </fieldset>
+
+        <button type="submit">Register</button>
+      </form>
+
+      <div id="msg" class="message" style="display: none"></div>
+      <p class="small">
+        Flow: SOAP RegisterUser → JSON CreateProfile → Redirect to Profile
+      </p>
+    </div>
+
+    <script type="module" src="./src/register.js"></script>
+  </body>
+</html>

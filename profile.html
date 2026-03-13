@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="page-header">
+        <h1>Profile</h1>
+        <div class="header-actions">
+          <button id="logoutBtn" class="secondary" type="button">Logout</button>
+        </div>
+      </header>
+      <p class="subtitle">View, edit, or delete your profile details</p>
+
+      <form id="profileForm">
+        <label>User ID</label>
+        <input id="id" disabled />
+
+        <label>Username</label>
+        <input id="username" disabled />
+
+        <label>Email</label>
+        <input id="email" type="email" />
+
+        <label>Name</label>
+        <input id="name" />
+
+        <label>Bio (optional)</label>
+        <textarea id="bio" rows="3"></textarea>
+
+        <label>Phone</label>
+        <input id="phone" />
+
+        <label>Location (optional)</label>
+        <input id="location" />
+
+        <label>Website (optional)</label>
+        <input id="website" />
+
+        <div class="row">
+          <button type="button" id="editBtn">Edit Profile</button>
+          <button type="submit" id="saveBtn" style="display: none">Save</button>
+          <button type="button" id="deleteBtn" class="secondary">
+            Delete Profile
+          </button>
+        </div>
+      </form>
+
+      <div id="msg" class="message" style="display: none"></div>
+      <p class="small">
+        Auth flow: Frontend -> REST /users -> REST middleware -> SOAP
+        ValidateToken
+      </p>
+    </div>
+
+    <script type="module" src="./src/profile.js"></script>
+  </body>
+</html>
