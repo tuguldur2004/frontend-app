@@ -7,8 +7,6 @@ npm start
 
 Runs on `http://localhost:8080`.
 
-Copy `.env.example` to `.env` and set values.
-
 ## Environment
 
 - `GATEWAY_PORT`

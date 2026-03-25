@@ -4,12 +4,16 @@ const path = require("path");
 const app = express();
 
 const PORT = process.env.GATEWAY_PORT || 8080;
-const REST_BASE = process.env.REST_BASE_URL || "http://localhost:3000";
+const REST_BASE = process.env.REST_BASE_URL || "http://localhost:8080";
 const SOAP_URL = process.env.SOAP_URL || "http://localhost:3001/ws";
-const FRONTEND_DIR = path.resolve(__dirname, "..", "frontend-app");
+const FRONTEND_DIR = path.resolve(__dirname, "..");
+const CORS_ALLOWED = process.env.CORS_ALLOWED_ORIGINS || "*";
+const PUBLIC_REST_URL = process.env.PUBLIC_REST_URL || "/api";
+const PUBLIC_SOAP_URL = process.env.PUBLIC_SOAP_URL || "/gateway/soap";
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  // Respect configured allowed origins in production; default to permissive for dev
+  res.header("Access-Control-Allow-Origin", CORS_ALLOWED);
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
@@ -21,6 +25,18 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+// Runtime env injection for client-side JS modules. The frontend can read window.__ENV.
+app.get("/env.js", (_req, res) => {
+  const env = {
+    REST_URL: process.env.PUBLIC_REST_URL || PUBLIC_REST_URL,
+    SOAP_URL: process.env.PUBLIC_SOAP_URL || PUBLIC_SOAP_URL,
+    GATEWAY_URL: process.env.GATEWAY_URL || "/gateway",
+  };
+  res.type("application/javascript");
+  res.send(`window.__ENV = ${JSON.stringify(env)};`);
+});
+
 app.use(express.static(FRONTEND_DIR));
 
 function escapeXml(value) {
@@ -99,7 +115,58 @@ async function proxyToRest(req, res, rewrittenPath) {
   res.send(text);
 }
 
+// SOAP proxy endpoints so the browser does not call the SOAP service directly.
+app.get("/gateway/soap*", async (req, res) => {
+  try {
+    const suffix = req.originalUrl.replace(/^\/gateway\/soap/, "");
+    const target = SOAP_URL + suffix;
+
+    const upstream = await fetch(target, {
+      method: "GET",
+      headers: { ...req.headers },
+    });
+    const text = await upstream.text();
+
+    res.status(upstream.status);
+    upstream.headers.forEach((value, key) => {
+      if (key.toLowerCase() !== "transfer-encoding") res.setHeader(key, value);
+    });
+    res.send(text);
+  } catch (e) {
+    res.status(502).send("SOAP proxy error");
+  }
+});
+
+app.post("/gateway/soap*", express.text({ type: "*/*" }), async (req, res) => {
+  try {
+    const suffix = req.originalUrl.replace(/^\/gateway\/soap/, "");
+    const target = SOAP_URL + suffix;
+
+    const headers = { ...req.headers };
+    delete headers.host;
+    const upstream = await fetch(target, {
+      method: "POST",
+      headers,
+      body: req.body,
+    });
+
+    const text = await upstream.text();
+    res.status(upstream.status);
+    upstream.headers.forEach((value, key) => {
+      if (key.toLowerCase() !== "transfer-encoding") res.setHeader(key, value);
+    });
+    res.send(text);
+  } catch (e) {
+    res.status(502).send("SOAP proxy error");
+  }
+});
+
 app.get("/gateway/health", (_req, res) => {
+  res.json({ status: "ok", service: "api-gateway", port: PORT });
+});
+
+// Generic health endpoint for platform health checks
+app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "api-gateway", port: PORT });
 });
 
