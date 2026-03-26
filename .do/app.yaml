@@ -1,10 +1,21 @@
 name: soa-app
 region: nyc1
 services:
-  - name: soa-frontend
-    image:
-      registry: registry.hub.docker.com/REPLACE_USER/soa-frontend:latest
-    run_command: node api-gateway/server.js
+  - name: frontend-app
+    static_sites:
+      - build_command: ""
+        output_dir: frontend-app
+    routes:
+      - path: /
+    http_port: 80
+    health_check:
+      protocol: HTTP
+      path: /index.html
+      port: 80
+
+  - name: api-gateway
+    dockerfile_path: api-gateway/Dockerfile
+    http_port: 8080
     envs:
       - key: GATEWAY_PORT
         value: "8080"
@@ -13,14 +24,14 @@ services:
       - key: SOAP_URL
         value: "http://user-soap-service:8080/ws"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://www.example.com"
+        value: "*"
       - key: PUBLIC_REST_URL
         value: "/api"
       - key: PUBLIC_SOAP_URL
         value: "/gateway/soap"
-    http_port: 8080
     routes:
-      - path: /
+      - path: /gateway/*
+      - path: /api/*
     health_check:
       protocol: HTTP
       path: /health
