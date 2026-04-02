@@ -3,8 +3,8 @@
 // All frontend requests must go through the API Gateway.
 // Ignore any environment-provided absolute URLs for REST/SOAP endpoints.
 // Always use gateway-relative paths.
-// Use the correct SOAP operation endpoint for user actions
-export const SOAP_URL = "gateway/soap/userauth";
+// Use the correct SOAP endpoint matching the WSDL address
+export const SOAP_URL = "gateway/soap";
 export const REST_URL = "/api";
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
 export const SOAP_NS = env.SOAP_NS || "http://userauth.soap.service/";
