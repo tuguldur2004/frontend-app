@@ -24,7 +24,7 @@ async function postSoap(xml) {
     method: "POST",
     headers: {
       "Content-Type": "text/xml;charset=UTF-8",
-      SOAPAction: '""',
+      SOAPAction: "",
     },
     body: xml,
   });
