@@ -1,11 +1,39 @@
-// Use runtime-injected values from /env.js when available (window.__ENV),
-// otherwise fall back to relative paths which work when the gateway proxies.
-// All frontend requests must go through the API Gateway.
-// Ignore any environment-provided absolute URLs for REST/SOAP endpoints.
-// Always use gateway-relative paths.
-// Use the correct SOAP endpoint matching the WSDL address
-export const SOAP_URL = "gateway/soap";
-export const REST_URL = "/api";
+// Use runtime-injected values from /env.js when available (window.__ENV).
+// Prefer explicit public URLs so the browser can reach the API gateway even
+// when the frontend is deployed on a different origin.
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
+
+const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || env.GATEWAY_URL || "";
+
+function pickUrl(...candidates) {
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+  return "";
+}
+
+function buildGatewayUrl(path) {
+  if (publicGatewayUrl && /^https?:\/\//i.test(publicGatewayUrl)) {
+    return new URL(path, publicGatewayUrl).toString();
+  }
+  return path;
+}
+
+export const SOAP_URL = pickUrl(
+  env.PUBLIC_SOAP_URL,
+  env.SOAP_URL,
+  buildGatewayUrl("/gateway/soap"),
+);
+export const REST_URL = pickUrl(
+  env.PUBLIC_REST_URL,
+  env.REST_URL,
+  buildGatewayUrl("/api"),
+);
 export const SOAP_NS = env.SOAP_NS || "http://userauth.soap.service/";
-export const GATEWAY_URL = "/gateway";
+export const GATEWAY_URL = pickUrl(
+  env.PUBLIC_GATEWAY_URL,
+  env.GATEWAY_URL,
+  "/gateway",
+);
