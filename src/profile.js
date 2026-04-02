@@ -1,6 +1,8 @@
 import { deleteProfile, getProfileByUsername, updateProfile } from "./api.js";
 import { showMessage, hideMessage } from "./ui.js";
 
+console.info("[PROFILE] loaded profile.js debug build 2026-04-03T18:10Z");
+
 const msg = document.getElementById("msg");
 const form = document.getElementById("profileForm");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -137,8 +139,10 @@ form.addEventListener("submit", async (e) => {
 });
 
 async function loadProfile() {
+  console.info("[PROFILE] loadProfile() start");
   hideMessage(msg);
   const token = localStorage.getItem("authToken");
+  console.info("[PROFILE] auth token present:", Boolean(token));
   if (!token) {
     window.location.href = "/login.html";
     return;
@@ -149,9 +153,11 @@ async function loadProfile() {
     authUserId > 0 ? String(authUserId) : "";
 
   const username = (localStorage.getItem("username") || "").trim();
+  console.info("[PROFILE] username from localStorage:", username);
   let profileResp = null;
   if (username) {
     profileResp = await getProfileByUsername(username, token);
+    console.info("[PROFILE] getProfileByUsername response:", profileResp);
   }
 
   if (!profileResp) {
@@ -218,4 +224,11 @@ async function loadProfile() {
   showMessage(msg, "Profile loaded.", true);
 }
 
-loadProfile().catch((e) => showMessage(msg, e.message || "Load error", false));
+loadProfile().catch((e) => {
+  console.error("[PROFILE] loadProfile failed", {
+    message: e?.message,
+    name: e?.name,
+    stack: e?.stack,
+  });
+  showMessage(msg, e.message || "Load error", false);
+});
