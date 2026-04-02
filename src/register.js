@@ -89,7 +89,7 @@ form.addEventListener("submit", async (e) => {
       );
       form.reset();
       setTimeout(() => {
-        window.location.href = "/profile";
+        window.location.href = "/profile.html";
       }, 2000);
       return;
     }
@@ -101,7 +101,7 @@ form.addEventListener("submit", async (e) => {
     );
     form.reset();
     setTimeout(() => {
-      window.location.href = "/profile";
+      window.location.href = "/profile.html";
     }, 1500);
   } catch (err) {
     showMessage(msg, err.message || "Register error", false);

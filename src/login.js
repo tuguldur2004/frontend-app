@@ -24,7 +24,7 @@ form.addEventListener("submit", async (e) => {
     showMessage(msg, "Login successful. Redirecting to profile...", true);
 
     setTimeout(() => {
-      window.location.href = "/profile";
+      window.location.href = "/profile.html";
     }, 500);
   } catch (err) {
     showMessage(msg, err.message || "Login error", false);

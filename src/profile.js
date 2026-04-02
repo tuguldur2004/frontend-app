@@ -57,7 +57,7 @@ function tokenUserId(token) {
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("authToken");
   localStorage.removeItem("username");
-  window.location.href = "/login";
+  window.location.href = "/login.html";
 });
 
 editBtn.addEventListener("click", () => {
@@ -88,7 +88,7 @@ deleteBtn.addEventListener("click", async () => {
       setTimeout(() => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("username");
-        window.location.href = "/register";
+        window.location.href = "/register.html";
       }, 2000);
       return;
     }
@@ -140,7 +140,7 @@ async function loadProfile() {
   hideMessage(msg);
   const token = localStorage.getItem("authToken");
   if (!token) {
-    window.location.href = "/login";
+    window.location.href = "/login.html";
     return;
   }
 
@@ -167,7 +167,7 @@ async function loadProfile() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("userId");
     showMessage(msg, "Unauthorized. Please login again.", false);
-    setTimeout(() => (window.location.href = "/login"), 900);
+    setTimeout(() => (window.location.href = "/login.html"), 900);
     return;
   }
 
@@ -177,7 +177,7 @@ async function loadProfile() {
     localStorage.removeItem("username");
     showMessage(msg, "Profile not found. Please register first.", false);
     setTimeout(() => {
-      window.location.href = "/register";
+      window.location.href = "/register.html";
     }, 2000);
     return;
   }
@@ -196,7 +196,7 @@ async function loadProfile() {
     localStorage.removeItem("userId");
     showMessage(msg, "Profile identity mismatch. Please login again.", false);
     setTimeout(() => {
-      window.location.href = "/login";
+      window.location.href = "/login.html";
     }, 900);
     return;
   }
