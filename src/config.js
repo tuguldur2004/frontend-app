@@ -2,8 +2,15 @@
 // Prefer explicit public URLs so the browser can reach the API gateway even
 // when the frontend is deployed on a different origin.
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
+const isLocalhost =
+  typeof window !== "undefined" &&
+  /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(window.location.hostname);
 
-const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || env.GATEWAY_URL || "";
+const defaultGatewayOrigin = isLocalhost
+  ? ""
+  : "https://api-gateway-gwzlj.ondigitalocean.app";
+
+const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || defaultGatewayOrigin;
 
 function pickUrl(...candidates) {
   for (const candidate of candidates) {
@@ -34,6 +41,5 @@ export const REST_URL = pickUrl(
 export const SOAP_NS = env.SOAP_NS || "http://userauth.soap.service/";
 export const GATEWAY_URL = pickUrl(
   env.PUBLIC_GATEWAY_URL,
-  env.GATEWAY_URL,
-  "/gateway",
+  defaultGatewayOrigin || "/gateway",
 );
