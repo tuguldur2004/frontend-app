@@ -38,6 +38,11 @@ export const REST_URL = pickUrl(
   env.REST_URL,
   buildGatewayUrl("/api"),
 );
+export const FILE_MANAGER_URL = pickUrl(
+  env.PUBLIC_FILE_MANAGER_URL,
+  env.FILE_MANAGER_URL,
+  buildGatewayUrl("/api/files"),
+);
 export const SOAP_NS = env.SOAP_NS || "http://userauth.soap.service/";
 export const GATEWAY_URL = pickUrl(
   env.PUBLIC_GATEWAY_URL,

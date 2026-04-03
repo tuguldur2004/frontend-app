@@ -1,4 +1,9 @@
-import { deleteProfile, getProfileByUsername, updateProfile } from "./api.js";
+import {
+  deleteProfile,
+  getProfileByUsername,
+  updateProfile,
+  uploadProfileImage,
+} from "./api.js";
 import { showMessage, hideMessage } from "./ui.js";
 
 console.info("[PROFILE] loaded profile.js debug build 2026-04-03T18:10Z");
@@ -9,6 +14,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 const editBtn = document.getElementById("editBtn");
 const saveBtn = document.getElementById("saveBtn");
 const deleteBtn = document.getElementById("deleteBtn");
+const avatarFileInput = document.getElementById("avatarFile");
+const uploadAvatarBtn = document.getElementById("uploadAvatarBtn");
 
 let currentProfileId = null;
 let isEditMode = false;
@@ -101,6 +108,60 @@ deleteBtn.addEventListener("click", async () => {
   }
 });
 
+uploadAvatarBtn.addEventListener("click", async () => {
+  hideMessage(msg);
+
+  const token = localStorage.getItem("authToken");
+  if (!token || !currentProfileId) {
+    showMessage(msg, "Please login and load profile first.", false);
+    return;
+  }
+
+  const file = avatarFileInput?.files?.[0];
+  if (!file) {
+    showMessage(msg, "Please choose an image file first.", false);
+    return;
+  }
+
+  try {
+    const uploaded = await uploadProfileImage(file, token);
+    if (
+      !(uploaded.status >= 200 && uploaded.status < 300) ||
+      !uploaded.body?.success
+    ) {
+      showMessage(msg, uploaded.body?.message || "Avatar upload failed", false);
+      return;
+    }
+
+    const avatarUrl = uploaded.body?.data?.url;
+    if (!avatarUrl) {
+      showMessage(msg, "Upload succeeded but URL is missing.", false);
+      return;
+    }
+
+    const saved = await updateProfile(
+      currentProfileId,
+      { avatar: avatarUrl },
+      token,
+    );
+
+    if (!(saved.status >= 200 && saved.status < 300) || !saved.body?.success) {
+      showMessage(
+        msg,
+        saved.body?.message || "Failed to save avatar URL",
+        false,
+      );
+      return;
+    }
+
+    document.getElementById("avatar").value = avatarUrl;
+    avatarFileInput.value = "";
+    showMessage(msg, "Avatar uploaded and saved to profile.", true);
+  } catch (err) {
+    showMessage(msg, err.message || "Avatar upload error", false);
+  }
+});
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   hideMessage(msg);
@@ -121,6 +182,7 @@ form.addEventListener("submit", async (e) => {
     name: document.getElementById("name").value.trim(),
     bio: document.getElementById("bio").value.trim(),
     phone: document.getElementById("phone").value.trim(),
+    avatar: document.getElementById("avatar").value.trim(),
     location: document.getElementById("location").value.trim(),
     website: document.getElementById("website").value.trim(),
   };
@@ -217,6 +279,7 @@ async function loadProfile() {
   document.getElementById("name").value = p.name ?? "";
   document.getElementById("bio").value = p.bio ?? "";
   document.getElementById("phone").value = p.phone ?? "";
+  document.getElementById("avatar").value = p.avatar ?? "";
   document.getElementById("location").value = p.location ?? "";
   document.getElementById("website").value = p.website ?? "";
 

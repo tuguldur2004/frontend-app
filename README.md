@@ -13,6 +13,12 @@ Frontend register/login/profile.
 - `/login`
 - `/profile`
 
+## Profile avatar upload
+
+- Profile page supports image upload through File Manager API.
+- Flow: Frontend -> API Gateway `/api/files/upload` -> File Manager Service -> DigitalOcean Spaces.
+- Returned URL is saved into REST profile `avatar` field.
+
 ## Deployment notes
 
 - The application is served by the API gateway in `api-gateway/server.js` which serves static files and proxies `/api/*` to the REST backend.

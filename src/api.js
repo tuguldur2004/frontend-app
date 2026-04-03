@@ -1,4 +1,4 @@
-import { REST_URL } from "./config.js";
+import { FILE_MANAGER_URL, REST_URL } from "./config.js";
 
 const DEBUG_BUILD = "frontend-api-debug-2026-04-03T18:10Z";
 console.info(`[API] loaded ${DEBUG_BUILD}; REST_URL=${REST_URL}`);
@@ -92,6 +92,21 @@ export async function deleteProfile(id, token) {
     method: "DELETE",
     headers: authHeaders(token),
     credentials: "omit",
+  });
+  return { status: res.status, body: await parseJsonSafe(res) };
+}
+
+export async function uploadProfileImage(file, token) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await loggedFetch(`${FILE_MANAGER_URL}/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "omit",
+    body: formData,
   });
   return { status: res.status, body: await parseJsonSafe(res) };
 }
