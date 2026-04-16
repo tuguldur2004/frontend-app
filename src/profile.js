@@ -22,6 +22,13 @@ const avatarInput = document.getElementById("avatar");
 const avatarPreview = document.getElementById("avatarPreview");
 const avatarPreviewEmpty = document.getElementById("avatarPreviewEmpty");
 
+if (avatarPreview) {
+  // Avoid sending Referer header to Spaces object URLs. This helps when
+  // bucket policies reject cross-site/hotlink requests that include Referer.
+  avatarPreview.referrerPolicy = "no-referrer";
+  avatarPreview.crossOrigin = "";
+}
+
 let currentProfileId = null;
 let isEditMode = false;
 
@@ -37,15 +44,26 @@ const editableFieldIds = [
 function setAvatarPreview(url) {
   const clean = (url || "").trim();
   if (!clean) {
+    avatarPreview.onload = null;
+    avatarPreview.onerror = null;
     avatarPreview.removeAttribute("src");
     avatarPreview.style.display = "none";
     avatarPreviewEmpty.style.display = "block";
     return;
   }
 
+  avatarPreview.onload = () => {
+    avatarPreview.style.display = "block";
+    avatarPreviewEmpty.style.display = "none";
+  };
+
+  avatarPreview.onerror = () => {
+    avatarPreview.removeAttribute("src");
+    avatarPreview.style.display = "none";
+    avatarPreviewEmpty.style.display = "block";
+  };
+
   avatarPreview.src = clean;
-  avatarPreview.style.display = "block";
-  avatarPreviewEmpty.style.display = "none";
 }
 
 function setEditableFieldsReadOnly(readOnly) {
