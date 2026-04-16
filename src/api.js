@@ -185,7 +185,7 @@ export async function uploadProfileImage(file, token) {
           message: errorBody?.message,
         });
         // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
         continue;
       }
 
@@ -202,7 +202,7 @@ export async function uploadProfileImage(file, token) {
         throw error;
       }
       // Wait before retrying
-      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
     }
   }
 
@@ -214,4 +214,18 @@ export async function uploadProfileImage(file, token) {
       message: lastError?.message || "Upload failed after retries",
     },
   };
+}
+
+export async function deleteUploadedFile(fileUrl, token) {
+  const res = await loggedFetch(
+    `${FILE_MANAGER_URL}?fileUrl=${encodeURIComponent(fileUrl)}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "omit",
+    },
+  );
+  return { status: res.status, body: await parseJsonSafe(res) };
 }

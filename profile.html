@@ -44,10 +44,18 @@
         <label>Avatar URL</label>
         <input id="avatar" readonly />
 
+        <div class="avatar-preview-wrap">
+          <img id="avatarPreview" class="avatar-preview" alt="Avatar preview" />
+          <p id="avatarPreviewEmpty" class="small">No avatar uploaded yet.</p>
+        </div>
+
         <label>Upload new avatar</label>
         <input id="avatarFile" type="file" accept="image/*" />
         <button type="button" id="uploadAvatarBtn" class="secondary">
           Upload Avatar
+        </button>
+        <button type="button" id="deleteAvatarFileBtn" class="secondary">
+          Delete Uploaded Avatar File
         </button>
 
         <div class="row">

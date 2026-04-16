@@ -1,4 +1,5 @@
 import {
+  deleteUploadedFile,
   deleteProfile,
   getProfileByUsername,
   updateProfile,
@@ -16,6 +17,10 @@ const saveBtn = document.getElementById("saveBtn");
 const deleteBtn = document.getElementById("deleteBtn");
 const avatarFileInput = document.getElementById("avatarFile");
 const uploadAvatarBtn = document.getElementById("uploadAvatarBtn");
+const deleteAvatarFileBtn = document.getElementById("deleteAvatarFileBtn");
+const avatarInput = document.getElementById("avatar");
+const avatarPreview = document.getElementById("avatarPreview");
+const avatarPreviewEmpty = document.getElementById("avatarPreviewEmpty");
 
 let currentProfileId = null;
 let isEditMode = false;
@@ -28,6 +33,20 @@ const editableFieldIds = [
   "location",
   "website",
 ];
+
+function setAvatarPreview(url) {
+  const clean = (url || "").trim();
+  if (!clean) {
+    avatarPreview.removeAttribute("src");
+    avatarPreview.style.display = "none";
+    avatarPreviewEmpty.style.display = "block";
+    return;
+  }
+
+  avatarPreview.src = clean;
+  avatarPreview.style.display = "block";
+  avatarPreviewEmpty.style.display = "none";
+}
 
 function setEditableFieldsReadOnly(readOnly) {
   editableFieldIds.forEach((id) => {
@@ -155,10 +174,58 @@ uploadAvatarBtn.addEventListener("click", async () => {
     }
 
     document.getElementById("avatar").value = avatarUrl;
+    setAvatarPreview(avatarUrl);
     avatarFileInput.value = "";
     showMessage(msg, "Avatar uploaded and saved to profile.", true);
   } catch (err) {
     showMessage(msg, err.message || "Avatar upload error", false);
+  }
+});
+
+deleteAvatarFileBtn.addEventListener("click", async () => {
+  hideMessage(msg);
+
+  const token = localStorage.getItem("authToken");
+  if (!token || !currentProfileId) {
+    showMessage(msg, "Please login and load profile first.", false);
+    return;
+  }
+
+  const avatarUrl = avatarInput.value.trim();
+  if (!avatarUrl) {
+    showMessage(msg, "No uploaded avatar file to delete.", false);
+    return;
+  }
+
+  const ok = window.confirm("Delete your uploaded avatar file?");
+  if (!ok) return;
+
+  try {
+    const deleted = await deleteUploadedFile(avatarUrl, token);
+    if (
+      !(deleted.status >= 200 && deleted.status < 300) ||
+      !deleted.body?.success
+    ) {
+      showMessage(msg, deleted.body?.message || "File delete failed", false);
+      return;
+    }
+
+    const saved = await updateProfile(currentProfileId, { avatar: "" }, token);
+    if (!(saved.status >= 200 && saved.status < 300) || !saved.body?.success) {
+      showMessage(
+        msg,
+        saved.body?.message || "File deleted but failed to clear avatar URL",
+        false,
+      );
+      return;
+    }
+
+    avatarInput.value = "";
+    avatarFileInput.value = "";
+    setAvatarPreview("");
+    showMessage(msg, "Uploaded avatar file deleted.", true);
+  } catch (err) {
+    showMessage(msg, err.message || "Avatar delete error", false);
   }
 });
 
@@ -280,6 +347,7 @@ async function loadProfile() {
   document.getElementById("bio").value = p.bio ?? "";
   document.getElementById("phone").value = p.phone ?? "";
   document.getElementById("avatar").value = p.avatar ?? "";
+  setAvatarPreview(p.avatar ?? "");
   document.getElementById("location").value = p.location ?? "";
   document.getElementById("website").value = p.website ?? "";
 
