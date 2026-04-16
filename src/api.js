@@ -15,7 +15,11 @@ async function parseJsonSafe(res) {
   try {
     return text ? JSON.parse(text) : null;
   } catch {
-    return { success: false, message: `Non-JSON response: ${text}` };
+    const compact = (text || "").replace(/\s+/g, " ").trim().slice(0, 240);
+    return {
+      success: false,
+      message: `Upstream returned non-JSON (HTTP ${res.status}). ${compact}`,
+    };
   }
 }
 

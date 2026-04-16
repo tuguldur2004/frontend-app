@@ -2,13 +2,7 @@
 // Prefer explicit public URLs so the browser can reach the API gateway even
 // when the frontend is deployed on a different origin.
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
-const isLocalhost =
-  typeof window !== "undefined" &&
-  /^(localhost|127\.0\.0\.1|\[::1\])$/i.test(window.location.hostname);
-
-const defaultGatewayOrigin = isLocalhost
-  ? ""
-  : "https://api-gateway-gwzlj.ondigitalocean.app";
+const defaultGatewayOrigin = "https://api-gateway-gwzlj.ondigitalocean.app";
 
 const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || defaultGatewayOrigin;
 

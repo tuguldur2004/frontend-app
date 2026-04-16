@@ -34,4 +34,4 @@ docker run -p 8080:8080 -e GATEWAY_PORT=8080 myorg/soa-frontend:latest
 
 Set environment variables (examples): `REST_BASE_URL`, `SOAP_URL`, `FILE_MANAGER_BASE_URL`, `CORS_ALLOWED_ORIGINS`, `PUBLIC_REST_URL`, `PUBLIC_SOAP_URL`, `PUBLIC_FILE_MANAGER_URL`, `PUBLIC_GATEWAY_URL`.
 
-For your deployed gateway, use `https://api-gateway-gwzlj.ondigitalocean.app` as the public gateway origin.
+For your deployed gateway, set `PUBLIC_GATEWAY_URL` to the current gateway domain, or leave it unset and use same-origin `/api` routing behind the App Platform routes.
