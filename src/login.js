@@ -1,5 +1,8 @@
 import { loginUser } from "./soapClient.js";
 import { showMessage, hideMessage } from "./ui.js";
+import { initFrontendLogging } from "./logger.js";
+
+initFrontendLogging("LOGIN");
 
 const form = document.getElementById("loginForm");
 const msg = document.getElementById("msg");

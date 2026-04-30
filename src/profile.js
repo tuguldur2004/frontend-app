@@ -6,6 +6,9 @@ import {
   uploadProfileImage,
 } from "./api.js";
 import { showMessage, hideMessage } from "./ui.js";
+import { initFrontendLogging } from "./logger.js";
+
+initFrontendLogging("PROFILE");
 
 console.info("[PROFILE] loaded profile.js debug build 2026-04-03T18:10Z");
 

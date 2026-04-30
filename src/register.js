@@ -1,6 +1,9 @@
 import { registerUser, loginUser } from "./soapClient.js";
 import { createProfile } from "./api.js";
 import { showMessage, hideMessage } from "./ui.js";
+import { initFrontendLogging, logError, logInfo, logWarn } from "./logger.js";
+
+initFrontendLogging("REGISTER");
 
 const form = document.getElementById("registerForm");
 const msg = document.getElementById("msg");
@@ -26,7 +29,17 @@ form.addEventListener("submit", async (e) => {
   const location = document.getElementById("location").value.trim();
   const website = document.getElementById("website").value.trim();
 
+  logInfo("REGISTER", "Submit started", {
+    username,
+    hasEmail: Boolean(email),
+    hasName: Boolean(name),
+    hasPhone: Boolean(phone),
+    hasLocation: Boolean(location),
+    hasWebsite: Boolean(website),
+  });
+
   try {
+    logInfo("REGISTER", "Calling SOAP RegisterUser", { username });
     const registerResult = await registerUser({
       username,
       password,
@@ -34,6 +47,10 @@ form.addEventListener("submit", async (e) => {
     });
 
     if (!registerResult.success) {
+      logWarn("REGISTER", "SOAP RegisterUser failed", {
+        username,
+        message: registerResult.message,
+      });
       showMessage(
         msg,
         `SOAP RegisterUser failed: ${registerResult.message}`,
@@ -42,9 +59,17 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
+    logInfo("REGISTER", "RegisterUser succeeded, calling LoginUser", {
+      username,
+      userId: registerResult.userId,
+    });
     const loginResult = await loginUser({ username, password });
 
     if (!loginResult.success) {
+      logWarn("REGISTER", "Login after register failed", {
+        username,
+        message: loginResult.message,
+      });
       showMessage(
         msg,
         `Login after register failed: ${loginResult.message}`,
@@ -55,12 +80,14 @@ form.addEventListener("submit", async (e) => {
 
     const token = loginResult.token;
     if (!token) {
+      logWarn("REGISTER", "Missing token after login", { username });
       showMessage(msg, "No token returned from login", false);
       return;
     }
 
     const authUserId = tokenUserId(token);
     if (authUserId <= 0) {
+      logWarn("REGISTER", "Invalid token payload", { username, authUserId });
       showMessage(msg, "Invalid token: no userId found", false);
       return;
     }
@@ -68,6 +95,10 @@ form.addEventListener("submit", async (e) => {
     localStorage.setItem("authToken", token);
     localStorage.setItem("username", username);
 
+    logInfo("REGISTER", "Calling createProfile", {
+      username,
+      authUserId,
+    });
     const profileResult = await createProfile(
       {
         authUserId,
@@ -82,6 +113,11 @@ form.addEventListener("submit", async (e) => {
     );
 
     if (!profileResult.success) {
+      logWarn("REGISTER", "Profile creation failed after account creation", {
+        username,
+        authUserId,
+        message: profileResult.message,
+      });
       showMessage(
         msg,
         `Profile creation failed: ${profileResult.message}. But account registered. Go to Profile page to complete profile.`,
@@ -94,6 +130,11 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
+    logInfo("REGISTER", "Register flow completed successfully", {
+      username,
+      authUserId,
+    });
+
     showMessage(
       msg,
       "Registration and profile creation successful. Redirecting...",
@@ -104,6 +145,7 @@ form.addEventListener("submit", async (e) => {
       window.location.href = "/profile.html";
     }, 1500);
   } catch (err) {
+    logError("REGISTER", "Unhandled register flow error", err, { username });
     showMessage(msg, err.message || "Register error", false);
   }
 });
