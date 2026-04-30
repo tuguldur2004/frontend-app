@@ -2,7 +2,10 @@
 // Prefer explicit public URLs so the browser can reach the API gateway even
 // when the frontend is deployed on a different origin.
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
-const defaultGatewayOrigin = "https://api-gateway-gwzlj.ondigitalocean.app";
+const defaultGatewayOrigin =
+  typeof window !== "undefined" && window.location?.origin
+    ? window.location.origin
+    : "";
 
 const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || defaultGatewayOrigin;
 
@@ -25,7 +28,7 @@ function buildGatewayUrl(path) {
 export const SOAP_URL = pickUrl(
   env.PUBLIC_SOAP_URL,
   env.SOAP_URL,
-  buildGatewayUrl("/gateway/soap"),
+  buildGatewayUrl("/api/soap"),
 );
 export const REST_URL = pickUrl(
   env.PUBLIC_REST_URL,

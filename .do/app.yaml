@@ -30,7 +30,7 @@ services:
       - key: PUBLIC_REST_URL
         value: "/api"
       - key: PUBLIC_SOAP_URL
-        value: "/gateway/soap"
+        value: "/api/soap"
       - key: PUBLIC_FILE_MANAGER_URL
         value: "/api/files"
     routes:

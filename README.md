@@ -23,7 +23,7 @@ Frontend register/login/profile.
 ## Deployment notes
 
 - The application is served by the API gateway in `api-gateway/server.js` which serves static files, proxies `/api/*` to the REST backend, and forwards `/api/files/*` to the file-manager service.
-- Runtime client config is exposed at `/env.js` (served by the gateway). The browser JS reads `window.__ENV` for `PUBLIC_GATEWAY_URL`, `PUBLIC_REST_URL`, and `PUBLIC_SOAP_URL`, and can fall back to same-origin `/api` and `/gateway/soap` during local gateway serving.
+- Runtime client config is exposed at `/env.js` (served by the gateway). The browser JS reads `window.__ENV` for `PUBLIC_GATEWAY_URL`, `PUBLIC_REST_URL`, and `PUBLIC_SOAP_URL`, and can fall back to same-origin `/api` and `/api/soap` during local gateway serving.
 
 Quick Docker build (from repository root) for the gateway + frontend:
 
