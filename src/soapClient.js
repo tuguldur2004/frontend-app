@@ -37,12 +37,23 @@ async function postSoap(xml, action = "") {
   );
 
   try {
+    const headers = {
+      "Content-Type": "text/xml;charset=UTF-8",
+    };
+
+    // Only set SOAPAction if provided
+    if (action) {
+      headers["SOAPAction"] = action;
+      console.debug(
+        `[SOAP-${requestId}] SOAPAction header set to: "${action}"`,
+      );
+    }
+
+    console.info(`[SOAP-${requestId}] Request headers:`, headers);
+
     const res = await fetch(SOAP_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "text/xml;charset=UTF-8",
-        SOAPAction: action,
-      },
+      headers,
       body: xml,
     });
 
@@ -113,8 +124,13 @@ export async function loginUser({ username, password }) {
   <ser:password>${escapeXml(password)}</ser:password>
 </ser:LoginUserRequest>`);
 
+  console.debug(`[SOAP-LOGIN] Full XML being sent:`, xml);
+
   try {
-    const doc = await postSoap(xml, `${SOAP_NS}LoginUserRequest`);
+    const action = `${SOAP_NS}LoginUserRequest`;
+    console.info(`[SOAP-LOGIN] SOAPAction will be: ${action}`);
+
+    const doc = await postSoap(xml, action);
     const result = {
       success: getText(doc, "success") === "true",
       message: getText(doc, "message"),
