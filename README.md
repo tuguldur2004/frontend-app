@@ -23,7 +23,8 @@ Frontend register/login/profile.
 ## Deployment notes
 
 - The application is served by the API gateway in `api-gateway/server.js` which serves static files, proxies `/api/*` to the REST backend, and forwards `/api/files/*` to the file-manager service.
-- Runtime client config is exposed at `/env.js` (served by the gateway). The browser JS reads `window.__ENV` for `PUBLIC_GATEWAY_URL`, `PUBLIC_REST_URL`, and `PUBLIC_SOAP_URL`, and can fall back to same-origin `/api` and `/api/soap` during local gateway serving.
+- Runtime client config is exposed at `/env.js` (served by the gateway). The browser JS reads `window.__ENV` for `PUBLIC_GATEWAY_URL`, `PUBLIC_REST_URL`, `PUBLIC_SOAP_URL`, and `PUBLIC_FILE_MANAGER_URL`.
+- For HTTPS frontends, keep these values on same-origin paths such as `/`, `/api`, `/api/soap`, and `/api/files` so the browser never calls an insecure `http://` upstream directly.
 
 Quick Docker build (from repository root) for the gateway + frontend:
 
@@ -34,4 +35,4 @@ docker run -p 8080:8080 -e GATEWAY_PORT=8080 myorg/soa-frontend:latest
 
 Set environment variables (examples): `REST_BASE_URL`, `SOAP_URL`, `FILE_MANAGER_BASE_URL`, `CORS_ALLOWED_ORIGINS`, `PUBLIC_REST_URL`, `PUBLIC_SOAP_URL`, `PUBLIC_FILE_MANAGER_URL`, `PUBLIC_GATEWAY_URL`.
 
-For your deployed gateway, set `PUBLIC_GATEWAY_URL` to the current gateway domain, or leave it unset and use same-origin `/api` routing behind the App Platform routes.
+For your deployed gateway, prefer same-origin paths in `PUBLIC_*` values when the frontend is served through the gateway or a reverse proxy. Only use an absolute gateway URL when the frontend must talk to a separate origin.
