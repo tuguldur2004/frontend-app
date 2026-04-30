@@ -2,10 +2,18 @@
 // Prefer explicit public URLs so the browser can reach the API gateway even
 // when the frontend is deployed on a different origin.
 const env = typeof window !== "undefined" && window.__ENV ? window.__ENV : {};
+console.info("[CONFIG] Environment variables loaded:", {
+  PUBLIC_GATEWAY_URL: env.PUBLIC_GATEWAY_URL,
+  PUBLIC_SOAP_URL: env.PUBLIC_SOAP_URL,
+  SOAP_URL: env.SOAP_URL,
+});
+
 const defaultGatewayOrigin =
   typeof window !== "undefined" && window.location?.origin
     ? window.location.origin
     : "";
+
+console.info("[CONFIG] Default gateway origin:", defaultGatewayOrigin);
 
 const publicGatewayUrl = env.PUBLIC_GATEWAY_URL || defaultGatewayOrigin;
 
@@ -45,3 +53,11 @@ export const GATEWAY_URL = pickUrl(
   env.PUBLIC_GATEWAY_URL,
   defaultGatewayOrigin || "/gateway",
 );
+
+console.info("[CONFIG] Resolved URLs:", {
+  SOAP_URL,
+  REST_URL,
+  FILE_MANAGER_URL,
+  SOAP_NS,
+  GATEWAY_URL,
+});
