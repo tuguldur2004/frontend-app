@@ -30,6 +30,11 @@ function buildGatewayUrl(path) {
   if (publicGatewayUrl && /^https?:\/\//i.test(publicGatewayUrl)) {
     return new URL(path, publicGatewayUrl).toString();
   }
+  if (publicGatewayUrl && publicGatewayUrl !== "/") {
+    const basePath = publicGatewayUrl.replace(/\/+$/, "");
+    const suffix = String(path || "").replace(/^\/+/, "");
+    return `${basePath}/${suffix}`;
+  }
   return path;
 }
 

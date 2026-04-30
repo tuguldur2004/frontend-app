@@ -5,8 +5,6 @@ services:
     static_sites:
       - build_command: ""
         output_dir: frontend-app
-    routes:
-      - path: /
     http_port: 80
     health_check:
       protocol: HTTP
@@ -33,14 +31,8 @@ services:
         value: "/api/soap"
       - key: PUBLIC_FILE_MANAGER_URL
         value: "/api/files"
-    routes:
-      - path: /gateway/*
-      - path: /api/*
-    health_check:
-      protocol: HTTP
-      path: /health
-      port: 8080
-
+      - key: PUBLIC_GATEWAY_URL
+        value: "/"
   - name: user-rest-service
     image:
       registry: registry.hub.docker.com/REPLACE_USER/user-rest-service:latest
@@ -104,6 +96,20 @@ services:
       protocol: HTTP
       path: /health
       port: 8080
+
+ingress:
+  rules:
+    - component:
+        name: api-gateway
+      match:
+        path:
+          prefix: /api
+    - component:
+        name: frontend-app
+        preserve_path_prefix: true
+      match:
+        path:
+          prefix: /
 
 databases: []
 
